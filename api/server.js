@@ -46,6 +46,23 @@ const contactSchema = new mongoose.Schema(
 
 const Contact = mongoose.model(`Contact`, contactSchema);
 
+// Booking Schema
+const bookingSchema = new mongoose.Schema(
+  {
+    fname: { type: String, required: true },
+    lname: { type: String, required: true },
+    date: { type: String, required: true },
+    time: { type: String, required: true },
+    phone: { type: String, required: true },
+    message: { type: String, required: false },
+  },
+  {
+    timestamps: true,
+  }
+);
+
+const Booking = mongoose.model(`Booking`, bookingSchema);
+
 // Add Contact Message to Database and Send Mail
 app.post(`/api/contact`, async (req, res) => {
   try {
@@ -88,6 +105,34 @@ app.post(`/api/contact`, async (req, res) => {
     });
   } catch (error) {
     console.error(`Error processing contact form:`, error);
+    res.status(500).json({
+      error: `An error occurred while processing your request`,
+      success: false,
+    });
+  }
+});
+
+// Add Contact Message to Database and Send Mail
+app.post(`/api/booking`, async (req, res) => {
+  try {
+    const { fname, lname, date, time, phone, message } = req.body;
+    const newBooking = new Booking({
+      fname,
+      lname,
+      date,
+      time,
+      phone,
+      message,
+    });
+
+    await newBooking.save();
+
+    res.status(200).json({
+      message: `Booking Request added successfully`,
+      success: true,
+    });
+  } catch (error) {
+    console.error(`Error processing Booking form:`, error);
     res.status(500).json({
       error: `An error occurred while processing your request`,
       success: false,
